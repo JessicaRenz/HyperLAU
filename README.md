@@ -33,3 +33,19 @@ HyperLAU does always output the two text files `best_likelihood_[name of the out
 - **transitions_[...].txt** This file contains the four coloumns `From`, `To`, `Probability` and `Flux`. In the coloumns `From` and `To` are the origin and destination node of a transition, encoded in the integer representation of the binary string. The coloumn `Probability` contains the transition probability that HyperLAU assigned to this edge. The last coloumn reports the calculated flux for the corresponding edge, which reflects the proportion of the trajectories that makes this transition.
 - **mean_[...].txt** This file contains three coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The last coloumn is the mean of the transition probabilities for all bootstrap resamples that were runned.
 - **sd_[...].txt** This file contains three coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The last coloumn is the standard deviation of the transition probabilities for all bootstrap resamples that were runned.
+  
+## R Scripts
+In this repository, we also provide a bunge of R scripts for plotting the results of HyperLAU, or for preparing or manipulating the input data. 
+
+### random_qm.R
+This script can be used to insert a certain amount of randomly uniform distributed "?" into an input dataset, as we did for the different case studies in the article introducing HyperLAU. The only required R library for running this script is `stringr`. Running the first part of the script inserts "?" in the whole dataset, i.e. at all positions in the string, whereas the second part does this only for a certain specified feature. In both cases one has to specify the input data set in the `read.table()` function, as well as the length of the binary strings `L`, the probability with which a position in the binary strings should be replaced by a "?" (this is done via the parameter `threshold`) and the name under which the manipulated data set should be saved (in the `write.table()` function). In the second case, when you want the "?" to be only in one certain feature, you have to specify the number of the position of this feature in the binary string (parameter `feature`). 
+
+### reconstruct.R
+This script can be used to reconstruct the input format HyperLAU expects from the output provided by PHYLIP. The required R libraries for running this script are `phytools` and `phangorn`. There are three parameters one has to specify at the top of the script: `input.trees`(output of PHYLIP which contains the information about the phylogenetic tree), `input.data` (the original cross-sectional data set that was used by PHYLIP to create the phylogenetic tree) and `output.data` (name under which the reconstructed file in the input format for HyperLAU should get). 
+
+## Data
+In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 
+
+In the subfolder `second_toyexample` there are the full dataset `full.txt` (all positions in all datapoints are specified as $0$ or $1$) we used for our second toy example among the ones where we inserted with a probability of $0.4$ uncertainty markers ("?") into a certain feature. 
+
+The subfolder `tb` contains all three datasets we used for the tuberculosis case studies. `tb_data_9.txt` contains the phylogeny reconstructed by considering only the datapoints of string length nine containing no missing states. Into this dataset, we inserted uncertainty markers ("?") with a probability of $0.5$ at all positions, which is the dataset `tb_data_9_qm50.txt`. The phylogenetic reconstruction (by PHYLIP) of the original data set of string length ten including also data points with missing states is stored as `phylo_tb_10.txt`. 

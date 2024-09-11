@@ -43,6 +43,13 @@ This script can be used to insert a certain amount of randomly uniform distribut
 ### reconstruct.R
 This script can be used to reconstruct the input format HyperLAU expects from the output provided by PHYLIP. The required R libraries for running this script are `phytools` and `phangorn`. There are three parameters one has to specify at the top of the script: `input.trees`(output of PHYLIP which contains the information about the phylogenetic tree), `input.data` (the original cross-sectional data set that was used by PHYLIP to create the phylogenetic tree) and `output.data` (name under which the reconstructed file in the input format for HyperLAU should get). 
 
+### plotting_HyperLAU_results.R
+This script contains all function that we used to produce the figures in the article introducing HyperLAU. The required R libraries for running this script are `ggplot2`, `ggraph`. `igraph`, `stringr` and `ggpubr`. 
+
+The first three functions `BinToDec`, `DecToBin` and `DecToBinV` are just functions that are needed by the actual plotting functions, for converting binary strings in integer and vice versa. 
+
+The function `plot_embedded_hypercube` is the function that plots the learned transitions pathways embedded in the full hypercube. 
+
 ## Data
 In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 
 

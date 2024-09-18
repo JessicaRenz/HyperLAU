@@ -527,7 +527,7 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 
 //performs the simulated annealing for model 1 - 4 (based on a rate vector)
 void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
-	double temp = 100000000000000000;
+	double temp = 1;
 	vector<double> x_old = x_initial;
 	vector<double> x_current = x_initial;
 	vector<double> x_current_temp = x_initial;
@@ -568,7 +568,7 @@ void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int
 
 		prog_best_lik.push_back(best_lik);
 		
-		if (temp == 100000000000000000){
+		if (temp == 1){
 			auto stop = high_resolution_clock::now();
 			auto duration = duration_cast<milliseconds>(stop - start);
 			cout << "Estimated time: " << num_it*duration.count()/60000 << " minutes" << endl;
@@ -581,7 +581,7 @@ void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int
 
 //performs simulated annealing for model -1 (based on a transition matrix)
 void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
-	double temp = 100000000000000000;
+	double temp = 1;
 	mat x_old = x_initial;
 	mat x_current = x_initial;
 	mat x_current_temp = x_initial;
@@ -639,7 +639,7 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 		prog_best_lik.push_back(best_lik);
 		
-		if (temp == 100000000000000000){
+		if (temp == 1){
 			auto stop = high_resolution_clock::now();
 			auto duration = duration_cast<milliseconds>(stop - start);
 			cout << "Estimated time: " << (num_it*duration.count())/60000 << " minutes" <<  endl;
@@ -895,6 +895,7 @@ int main(int argc, char**argv){
   				}
   			}
 
+			/*	
 			//creating outputs
   			ofstream bt;
   			bt.open("bootstrap_"+ to_string(i) + "_" + out_name + ".txt");
@@ -906,7 +907,7 @@ int main(int argc, char**argv){
   					}
   				}
   			}
-  			bt.close();
+  			bt.close();*/
 		}
 
 		mat mean(pow(2,L),pow(2,L),fill::zeros);

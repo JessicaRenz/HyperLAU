@@ -1,7 +1,8 @@
 # HyperLAU
 Hypercubic transition paths with Linear Algebra for Uncertainty: Inference of accumulation pathways in discrete time, under models allowing different degree of dependencies, using observations that might include missing or uncertain states.
 
-![graphical_abstract](https://github.com/user-attachments/assets/25a74577-28a2-460e-a875-f6122375f53b)
+![graphical_abstract](https://github.com/user-attachments/assets/cb4aa11a-fdaa-493d-81dc-983b1167f10a)
+
 
 
 ## Requirements

@@ -185,6 +185,7 @@ plot_likelihood <- function(df.1,df.2,df.3,df.4,df.5,df.6){
 }
 
 #data visualisation
+data_vis(df){
 df = read.table("tb_9", stringsAsFactors = FALSE)
 strings = df[2:nrow(df), 2]
 
@@ -198,3 +199,4 @@ df_long <- data.frame(
 )
 
 ggplot(df_long, aes(x=position,y=string_reference, fill=character)) + geom_tile()
+}

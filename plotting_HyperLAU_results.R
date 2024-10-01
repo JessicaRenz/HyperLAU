@@ -185,8 +185,9 @@ plot_likelihood <- function(df.1,df.2,df.3,df.4,df.5,df.6){
 }
 
 #data visualisation
-data_vis(df){
-df = read.table("tb_9", stringsAsFactors = FALSE)
+
+data_vis(label){
+df = read.table(label, stringsAsFactors = FALSE)
 strings = df[2:nrow(df), 2]
 
 split_strings <- strsplit(strings, "")

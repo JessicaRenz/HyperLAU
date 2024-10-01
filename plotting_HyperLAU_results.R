@@ -183,3 +183,18 @@ plot_likelihood <- function(df.1,df.2,df.3,df.4,df.5,df.6){
 
     plot(res)
 }
+
+#data visualisation
+df = read.table("tb_9", stringsAsFactors = FALSE)
+strings = df[2:nrow(df), 2]
+
+split_strings <- strsplit(strings, "")
+
+# Create a data frame with the string reference, position, and character
+df_long <- data.frame(
+  string_reference = rep(seq_along(strings), sapply(split_strings, length)),
+  position = sequence(sapply(split_strings, length)),
+  character = unlist(split_strings)
+)
+
+ggplot(df_long, aes(x=position,y=string_reference, fill=character)) + geom_tile()

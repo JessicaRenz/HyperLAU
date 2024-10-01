@@ -51,6 +51,8 @@ The first three functions `BinToDec`, `DecToBin` and `DecToBinV` are just functi
 
 The function `plot_embedded_hypercube` is the function that plots the learned transitions pathways embedded in the full hypercube. 
 
+The function `data_vis` is the function that plots the visualisation of the presence, absence and uncertainty in the phylogenetic input data. The only input parameter is the name of the input data set. 
+
 ## Data
 In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 
 

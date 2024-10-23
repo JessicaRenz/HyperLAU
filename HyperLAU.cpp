@@ -819,6 +819,7 @@ int main(int argc, char**argv){
   	
 
   	std::vector<Matrix> all_matrices(bootstrap, Matrix(pow(2,L), std::vector<double>(pow(2,L))));
+  	std::vector<Matrix> all_fluxes(bootstrap, Matrix(pow(2,L), std::vector<double>(pow(2,L))));
   	
   	
 	
@@ -888,14 +889,15 @@ int main(int argc, char**argv){
 
   			//Calculating the fluxes
   			mat fluxes(pow(2,L),pow(2,L), fill::zeros);
-  			for(int i = 0; i<pow(2,L); i++){
-  				for(int j = 0; j < pow(2,L); j++){
-  					double flux = sum(P_fin.row(j))* best_trans_mat_bt(i,j);
-  					fluxes(i,j) = flux;
+  			for(int j = 0; j<pow(2,L); j++){
+  				for(int k = 0; k < pow(2,L); k++){
+  					double flux = sum(P_fin.row(k))* best_trans_mat_bt(j,k);
+  					fluxes(j,k) = flux;
+  					all_fluxes[i-1][j][k] = fluxes(j,k);
   				}
   			}
 
-			/*	
+				
 			//creating outputs
   			ofstream bt;
   			bt.open("bootstrap_"+ to_string(i) + "_" + out_name + ".txt");
@@ -907,7 +909,7 @@ int main(int argc, char**argv){
   					}
   				}
   			}
-  			bt.close();*/
+  			bt.close();
 		}
 
 		mat mean(pow(2,L),pow(2,L),fill::zeros);
@@ -922,14 +924,27 @@ int main(int argc, char**argv){
     				mean(j,k) = m;
     			}
     		}
+    		
+    		mat mean_flux(pow(2,L),pow(2,L),fill::zeros);
+    		//calculating the mean
+    		for (int j = 0; j<pow(2,L); j++){
+    			for (int k = 0; k<pow(2,L); k++){
+    				double sum = 0;
+    				for (int i = 0; i< bootstrap; i++){
+    					sum = sum + all_fluxes[i][j][k];
+    				}
+    				double m = sum/bootstrap;
+    				mean_flux(j,k) = m;
+    			}
+    		}
 	
 		ofstream trans_mean;
   		trans_mean.open("mean_" + out_name + ".txt");
-  		outdata << "From " << "To " << "Probability " << endl;
+  		trans_mean << "From " << "To " << "Probability " << "Flux" << endl;
   		for(int i = 0; i<pow(2,L); i++){
   			for(int j = 0; j < pow(2,L); j++){
-  				if (mean(j,i) != 0){
-  					trans_mean << i << " " << j << " " << mean(j,i)  << endl;
+  				if((mean(j,i) != 0) || (mean_flux(j,i) != 0)){
+  					trans_mean << i << " " << j << " " << mean(j,i) << " " << mean_flux(j,i) << endl;
   				}
   			}
   		}
@@ -947,14 +962,27 @@ int main(int argc, char**argv){
     				sd(j,k) = s;
     			}
     		}
+    		
+    		mat sd_flux(pow(2,L),pow(2,L),fill::zeros);
+  		//calculating the standard deviation
+  		for (int j = 0; j<pow(2,L); j++){
+    			for (int k = 0; k<pow(2,L); k++){
+    				double sum = 0;
+    				for (int i = 0; i< bootstrap; i++){
+    					sum = sum + pow(all_fluxes[i][j][k] - mean_flux(j,k),2);
+    				}
+    				double s = sqrt(sum/(bootstrap - 1));
+    				sd_flux(j,k) = s;
+    			}
+    		}
 
     		ofstream trans_sd;
   		trans_sd.open("sd_" + out_name + ".txt");
-  		outdata << "From " << "To " << "Probability " << endl;
+  		trans_sd << "From " << "To " << "Probability " << "Flux " << endl;
   		for(int i = 0; i<pow(2,L); i++){
   			for(int j = 0; j < pow(2,L); j++){
-  				if (sd(j,i) != 0){
-  					trans_sd << i << " " << j << " " << sd(j,i)  << endl;
+  				if((sd(j,i) != 0) || (sd(j,i) !=0)){
+  					trans_sd << i << " " << j << " " << sd(j,i) << " " << sd_flux(j,i) << endl;
   				}
   			}
   		}

@@ -12,7 +12,7 @@ For running the plotting tools as well as the tools to reconstruct a HyperLAU in
 `ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph`,`stringr`,`phytools` and `phangorn`.
 
 ## Running HyperLAU
-HyperLAU can be compiled in the command line by the following command:
+HyperLAU can be compiled in the command line, for example by the following command:
 ```
 g++ HyperLAU.cpp -o HyperLAU -larmadillo
 ```
@@ -29,11 +29,12 @@ After compiling, HyperLAU can be runned directly from the command line by specif
 - **denom** This parameter specifies, how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: `temp = temp/denom`. This parameter should be a double $>1$.
 
 ## Output
-HyperLAU does always output the two text files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is chosen to be bigger than zero, it outputs two additional files `mean_[name of the output file].txt`and `sd_[name of the output file].txt`.
+HyperLAU does always output the two text files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is chosen to be bigger than zero, it outputs two additional files `mean_[name of the output file].txt`and `sd_[name of the output file].txt`, as well as a file `bootstrap_[bootstrap number]_[name of the outpu file].txt` for every bootstrap resample.
 - **best_likelihood_[..].txt** In this output you can find the intermediate results for the currently best log-likelihood. Every line corresponds to a certain loop in the Simulated Annealing optimization and contains the log-likelihood that is stored as the best log-likelihood until the end of this loop. This file helps to track the progression of the optimization and can give some insight if the optimiziation process was running long enough for the log-likelihood to converge.
 - **transitions_[...].txt** This file contains the four coloumns `From`, `To`, `Probability` and `Flux`. In the coloumns `From` and `To` are the origin and destination node of a transition, encoded in the integer representation of the binary string. The coloumn `Probability` contains the transition probability that HyperLAU assigned to this edge. The last coloumn reports the calculated flux for the corresponding edge, which reflects the proportion of the trajectories that makes this transition.
-- **mean_[...].txt** This file contains three coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The last coloumn is the mean of the transition probabilities for all bootstrap resamples that were runned.
-- **sd_[...].txt** This file contains three coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The last coloumn is the standard deviation of the transition probabilities for all bootstrap resamples that were runned.
+- **mean_[...].txt** This file contains four coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The coloumn `Probabiliy` contains the mean of the transition probabilities for all bootstrap resamples that were runned, the column `Flux` the mean of all fluxes accordingly.
+- **sd_[...].txt** This file contains four coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The coloumn `Probability` contains the standard deviation of the transition probabilities for all bootstrap resamples that were runned, the column `Flux` the standard deviation of all fluxes accordingly.
+- **bootstrap_[...]** These files contain the four coloumns `From`, `To`, `Probability` and `Flux`. In the coloumns `From` and `To` are the origin and destination node of a transition, encoded in the integer representation of the binary string. The coloumn `Probability` contains the transition probability that HyperLAU assigned to this edge, based on the considered Bootstrap resample. The last coloumn reports the corresponding calculated flux for the edge, which reflects the proportion of the trajectories that makes this transition.
   
 ## R Scripts
 In this repository, we also provide a bunge of R scripts for plotting the results of HyperLAU, or for preparing or manipulating the input data. 

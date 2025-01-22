@@ -283,6 +283,15 @@ void build_trans_matrix(int L, vector<double> x_current, int model, mat& mat_tem
 double loglh(vector<string> before, vector<string> after, vector<int> frequ, int L, vector<double> x_current, int model){
 
 	vec loglh(before.size(), fill::zeros);
+	
+	// 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
+        mat P_desc(pow(2,L),L+1, fill::zeros);
+	P_desc(0,0) = 1;
+	mat mat_temp(pow(2,L),pow(2,L), fill::zeros);
+	build_trans_matrix(L,x_current,model,mat_temp);
+	for (int t = 1; t <= L; t++){
+		P_desc.col(t) = mat_temp * P_desc.col(t-1);
+	}
 
 	// 1.) Write down the sets of all the compatible states for the before and the after datapoint
 		for (int l = 0; l< before.size(); l++){
@@ -335,16 +344,8 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 				}
 			}
 
-			// 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
-
-			mat P(pow(2,L),L+1, fill::zeros);
-			P(0,0) = 1;
-			mat mat_temp(pow(2,L),pow(2,L), fill::zeros);
-			build_trans_matrix(L,x_current,model,mat_temp);
-			for (int t = 1; t <= L; t++){
-				P.col(t) = mat_temp * P.col(t-1);
-			}
-
+			
+                        mat P = P_desc;
 
 			// 3.) Loop through t from 0 to L
 
@@ -405,6 +406,13 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 
 //Calculate the new likelihood given the new matrix
 		vec loglh(before.size(), fill::zeros);
+		
+	        // 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
+                mat P_desc(pow(2,L),L+1, fill::zeros);
+		P_desc(0,0) = 1;
+		for (int t = 1; t<=L; t++){
+			P_desc.col(t) = x_current * P_desc.col(t-1);
+		}
 
 		// 1.) Write down the sets of all the compatible states for the before and the after datapoint
 		for (int l = 0; l< before.size(); l++){
@@ -459,13 +467,7 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 			}
 
 
-			// 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
-
-			mat P(pow(2,L),L+1, fill::zeros);
-			P(0,0) = 1;
-			for (int t = 1; t<=L; t++){
-				P.col(t) = x_current * P.col(t-1);
-			}
+			mat P = P_desc;
 
 
 			// 3.) Loop through t from 0 to L

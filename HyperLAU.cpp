@@ -256,7 +256,7 @@ double rate(int i, int j, vector<double> x_current, int L, int model){
 }
 
 //transforms an vector with transition rates into the form of a matrix including transition probabilities
-void build_trans_matrix(int L, vector<double> x_current, int model, sp_mat& mat_temp){
+void build_trans_matrix(int L, vector<double> x_current, int model, mat& mat_temp){
 	for (int j = 0; j< pow(2,L); j++){
 		for (int i = 0; i < pow(2,L); i++){
 			if (j< i){
@@ -285,9 +285,9 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 	vec loglh(before.size(), fill::zeros);
 	
 	// 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
-        sp_mat P_desc(pow(2,L),L+1);
+        mat P_desc(pow(2,L),L+1, fill::zeros);
 	P_desc(0,0) = 1;
-	sp_mat mat_temp(pow(2,L),pow(2,L));
+	mat mat_temp(pow(2,L),pow(2,L), fill::zeros);
 	build_trans_matrix(L,x_current,model,mat_temp);
 	for (int t = 1; t <= L; t++){
 		P_desc.col(t) = mat_temp * P_desc.col(t-1);
@@ -345,15 +345,15 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 			}
 
 			
-                        sp_mat P = P_desc;
+                        mat P = P_desc;
 
 			// 3.) Loop through t from 0 to L
 
 			vector<double> comp_probs;
-			sp_mat Q(pow(2,L),L+1);
+			mat Q(pow(2,L),L+1, fill::zeros);
 
 			for (int t = 0; t<=L; t++){
-				vec P_0 = vec(P.col(t));
+				vec P_0 = P.col(t);
 
 				vec P_0_comp(pow(2,L), fill::zeros);
 				for(int i = 0; i< c_before.size(); i++){
@@ -364,14 +364,14 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 					vec Q_0_comp(pow(2,L), fill::zeros);
 					vec Q_col_0 = P_0_comp;
 
-					sp_mat Q(pow(2,L),L+1);
+					mat Q(pow(2,L),L+1, fill::zeros);
 					Q.col(t) = Q_col_0;
 					for (int s = t+1; s<=L; s++){
 						Q.col(s) = mat_temp * Q.col(s-1);
 					}
 
 					for(int s = 0; s<=L; s++){
-						vec Q_0 = vec(Q.col(s));
+						vec Q_0 = Q.col(s);
 						for(int i = 0; i< c_after.size(); i++){
 							Q_0_comp[i] = c_after[i]*Q_0[i];
 						}
@@ -390,8 +390,8 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 				lh = lh + comp_probs[i];
 			}
 
-			double factor = pow(L+1,-1);
-			double normlh = pow(factor,2)*lh;
+			double factor = (L+1)*(L+2);
+			double normlh = 2/factor*lh;
 			loglh[l] = log(normlh)*frequ[l];
 
 		}
@@ -402,13 +402,13 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 
 
 // calculates the log-likelihood to see a the data given a transition matrix 
-double loglh_minus_1(vector<string> before, vector<string> after, vector<int> frequ, int L, sp_mat x_current){
+double loglh_minus_1(vector<string> before, vector<string> after, vector<int> frequ, int L, mat x_current){
 
 //Calculate the new likelihood given the new matrix
 		vec loglh(before.size(), fill::zeros);
 		
 	        // 2.) Use the transition matrix state vector approach to simulate the system over timesteps t
-                sp_mat P_desc(pow(2,L),L+1);
+                mat P_desc(pow(2,L),L+1, fill::zeros);
 		P_desc(0,0) = 1;
 		for (int t = 1; t<=L; t++){
 			P_desc.col(t) = x_current * P_desc.col(t-1);
@@ -467,16 +467,16 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 			}
 
 
-			sp_mat P = P_desc;
+			mat P = P_desc;
 
 
 			// 3.) Loop through t from 0 to L
 
 			vector<double> comp_probs;
-			sp_mat Q(pow(2,L),L+1);
+			mat Q(pow(2,L),L+1, fill::zeros);
 
 			for (int t = 0; t<=L; t++){
-				vec P_0 = vec(P.col(t));
+				vec P_0 = P.col(t);
 
 				vec P_0_comp(pow(2,L), fill::zeros);
 				for(int i = 0; i< c_before.size(); i++){
@@ -487,14 +487,14 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 					vec Q_0_comp(pow(2,L), fill::zeros);
 					vec Q_col_0 = P_0_comp;
 
-					sp_mat Q(pow(2,L),L+1);
+					mat Q(pow(2,L),L+1, fill::zeros);
 					Q.col(t) = Q_col_0;
 					for (int s = t+1; s<=L; s++){
 					Q.col(s) = x_current * Q.col(s-1);
 					}
 
 					for(int s = 0; s<=L; s++){
-						vec Q_0 = vec(Q.col(s));
+						vec Q_0 = Q.col(s);
 						for(int i = 0; i< c_after.size(); i++){
 							Q_0_comp[i] = c_after[i]*Q_0[i];
 						}
@@ -513,8 +513,8 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 				lh = lh + comp_probs[i];
 			}
 
-			double factor = pow(L+1,-1);
-			double normlh = pow(factor,2)*lh;
+			double factor = (L+1)*(L+2);
+			double normlh = 2/factor*lh;
 			loglh[l] = log(normlh)*frequ[l];
 			if(normlh <=0){
 				printf("Formal error in dataset\n");
@@ -582,11 +582,11 @@ void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int
 }
 
 //performs simulated annealing for model -1 (based on a transition matrix)
-void simulated_annealing_minus_1(sp_mat x_initial, sp_mat& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
+void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
 	double temp = 1;
-	sp_mat x_old = x_initial;
-	sp_mat x_current = x_initial;
-	sp_mat x_current_temp = x_initial;
+	mat x_old = x_initial;
+	mat x_current = x_initial;
+	mat x_current_temp = x_initial;
 
 	double lik_initial = loglh_minus_1(before, after, frequ, L, x_initial);
 
@@ -672,7 +672,7 @@ int main(int argc, char**argv){
 	//initialising the rate matrix
 	int num_param = pow(L,model);
 	vector<double> rate_vec(num_param, 0.0);
-	sp_mat rate_matrix(pow(2,L),pow(2,L));
+	arma::mat rate_matrix(pow(2,L),pow(2,L), arma::fill::zeros);
 	if (model != -1){
 		uniform_rate_matrix(rate_vec, model, L);
 	}else{
@@ -700,8 +700,8 @@ int main(int argc, char**argv){
 
 	vector<double> x_initial_vec;
 	vector<double> best_vec;
-	sp_mat x_initial;
-	sp_mat best_mat;
+	mat x_initial;
+	mat best_mat;
 	if (model != -1){
 		x_initial_vec = rate_vec;
 		best_vec = rate_vec;
@@ -769,7 +769,7 @@ int main(int argc, char**argv){
 		simulated_annealing_minus_1(x_initial, best_mat, L, before, after, frequ, model, prog_best_lik, denom);
 	}
 
-	sp_mat final_trans_matrix(pow(2,L), pow(2,L));
+	mat final_trans_matrix(pow(2,L), pow(2,L), fill::zeros);
 	if (model !=-1){
 		build_trans_matrix(L, best_vec, model, final_trans_matrix);
 	}else{
@@ -777,14 +777,14 @@ int main(int argc, char**argv){
 	}
 	
 	//final probability distribution
-	sp_mat P_fin(pow(2,L),L+1);
+	mat P_fin(pow(2,L),L+1, fill::zeros);
 	P_fin(0,0) = 1;
 	for (int t = 1; t<=L; t++){
 		P_fin.col(t) = final_trans_matrix * P_fin.col(t-1);
 	}
 
   	//Calculating the fluxes
-  	sp_mat fluxes(pow(2,L),pow(2,L));
+  	mat fluxes(pow(2,L),pow(2,L), fill::zeros);
   	for(int i = 0; i<pow(2,L); i++){
   		for(int j = 0; j < pow(2,L); j++){
   			double flux = sum(P_fin.row(j))* final_trans_matrix(i,j);
@@ -865,8 +865,8 @@ int main(int argc, char**argv){
 
   			vector<double> prog_best_lik_bt;
   			vector<double> best_vec_bt;
-  			sp_mat best_mat_bt;
-  			sp_mat best_trans_mat_bt(pow(2,L),pow(2,L));
+  			mat best_mat_bt;
+  			mat best_trans_mat_bt(pow(2,L),pow(2,L), fill::zeros);
   			if (model != -1){
   				best_vec_bt = x_initial_vec;
   				simulated_annealing(x_initial_vec, best_vec_bt, L, before_bt, after_bt, frequ_bt, model, prog_best_lik_bt, denom);
@@ -883,14 +883,14 @@ int main(int argc, char**argv){
         		}
         		
         		//final probability distribution
-			sp_mat P_fin(pow(2,L),L+1);
+			mat P_fin(pow(2,L),L+1, fill::zeros);
 			P_fin(0,0) = 1;
 			for (int t = 1; t<=L; t++){
 				P_fin.col(t) = best_trans_mat_bt * P_fin.col(t-1);
 			}
 
   			//Calculating the fluxes
-  			sp_mat fluxes(pow(2,L),pow(2,L));
+  			mat fluxes(pow(2,L),pow(2,L), fill::zeros);
   			for(int j = 0; j<pow(2,L); j++){
   				for(int k = 0; k < pow(2,L); k++){
   					double flux = sum(P_fin.row(k))* best_trans_mat_bt(j,k);
@@ -914,7 +914,7 @@ int main(int argc, char**argv){
   			bt.close();
 		}
 
-		sp_mat mean(pow(2,L),pow(2,L));
+		mat mean(pow(2,L),pow(2,L),fill::zeros);
     		//calculating the mean
     		for (int j = 0; j<pow(2,L); j++){
     			for (int k = 0; k<pow(2,L); k++){
@@ -927,7 +927,7 @@ int main(int argc, char**argv){
     			}
     		}
     		
-    		sp_mat mean_flux(pow(2,L),pow(2,L));
+    		mat mean_flux(pow(2,L),pow(2,L),fill::zeros);
     		//calculating the mean
     		for (int j = 0; j<pow(2,L); j++){
     			for (int k = 0; k<pow(2,L); k++){
@@ -952,7 +952,7 @@ int main(int argc, char**argv){
   		}
   		trans_mean.close();
 	
-  		sp_mat sd(pow(2,L),pow(2,L));
+  		mat sd(pow(2,L),pow(2,L),fill::zeros);
   		//calculating the standard deviation
   		for (int j = 0; j<pow(2,L); j++){
     			for (int k = 0; k<pow(2,L); k++){
@@ -965,7 +965,7 @@ int main(int argc, char**argv){
     			}
     		}
     		
-    		sp_mat sd_flux(pow(2,L),pow(2,L));
+    		mat sd_flux(pow(2,L),pow(2,L),fill::zeros);
   		//calculating the standard deviation
   		for (int j = 0; j<pow(2,L); j++){
     			for (int k = 0; k<pow(2,L); k++){

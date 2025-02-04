@@ -655,6 +655,12 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 int main(int argc, char**argv){
 // arguments: [name of the input file] [string length] [name of the output file] [number of bootstraps] [number for a random seed] [model] [denom]
+        const int expectedArgs = 8;
+        
+        if(argc != expectedArgs){
+                std::cerr << "Non-valid number of arguments. Usage: " << argv[0] << "[name of the input file] [string length] [name of the output file] [number of bootstraps]   [number for a random seed] [model] [denom]";
+                return 1;
+        }
 	
 	L= atoi(argv[2]);
 	string file_name = argv[1];

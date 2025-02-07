@@ -1,7 +1,7 @@
 # HyperLAU
 Hypercubic transition paths with Linear Algebra for Uncertainty: Inference of accumulation pathways in discrete time, under models allowing different degree of dependencies, using observations that might include missing or uncertain states.
 
-![graphical_abstract](https://github.com/user-attachments/assets/cb4aa11a-fdaa-493d-81dc-983b1167f10a)
+![graphical_abstract-igj](https://github.com/user-attachments/assets/8a34d662-9124-46f4-8f7f-ad0301e6f266)
 
 
 
@@ -9,7 +9,7 @@ Hypercubic transition paths with Linear Algebra for Uncertainty: Inference of ac
 For running HyperLAU, you need the ability to compile and run C++ code, and having the library `armadillo` installed. 
 
 For running the plotting tools as well as the tools to reconstruct a HyperLAU input dataset from the output of PHYLIP, you need R with the following libraries: 
-`ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph`,`stringr`,`phytools` and `phangorn`.
+`ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph` and `dplyr`.
 
 ## Running HyperLAU
 HyperLAU can be compiled in the command line, for example by the following command:
@@ -20,7 +20,12 @@ After compiling, HyperLAU can be runned directly from the command line by specif
 ```
 ./HyperLAU [name of the input file] [string length] [name of the output file] [number of bootstrap resamples] [number for a random seed] [model] [denom]
 ```
-- **name of the input file** Name of the file that contains the input data, including the extension `.txt`. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states, for example `01? 011`. Both states are encoded by binary strings, but can contain one or more `?` to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.
+The following command, for example, will run a dataset called `data.txt` containing strings of length six and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
+```
+./HyperLAU data.txt 6 data 0 1 -1 1.001
+```
+
+- **name of the input file** Name of the file that contains the input data, including possible extensions like `.txt`. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example `01? 011`. Both states are encoded by binary strings, but can contain one or more `?` to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.
 - **string length** Number of features to consider, has to be an integer.
 - **name of the output file** HyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is specified as $>0$, you will also get two additional files called `mean_[name of the output file].txt`and `sd_[name of the output file].txt`.
 - **number of bootstrap resamples** If specified as 0, no bootstrapping will be done.
@@ -36,27 +41,31 @@ HyperLAU does always output the two text files `best_likelihood_[name of the out
 - **sd_[...].txt** This file contains four coloumns. The firts two ones give the origin and destination of the considered transition in the same way as in the file `transitions_[...].txt`. The coloumn `Probability` contains the standard deviation of the transition probabilities for all bootstrap resamples that were runned, the column `Flux` the standard deviation of all fluxes accordingly.
 - **bootstrap_[...]** These files contain the four coloumns `From`, `To`, `Probability` and `Flux`. In the coloumns `From` and `To` are the origin and destination node of a transition, encoded in the integer representation of the binary string. The coloumn `Probability` contains the transition probability that HyperLAU assigned to this edge, based on the considered Bootstrap resample. The last coloumn reports the corresponding calculated flux for the edge, which reflects the proportion of the trajectories that makes this transition.
   
+## Bash Script
+You can also find the bash script `run_examples.sh` in the repository. When executing the script, you will run example calculations on all data sets provided. In order to do this the folder `data`has to be sotred in the same direction as the bash script itself. Then you can make the bash script executable (if not already done) and run it, for example with
+```
+chmod +x run_examples.sh
+./run_examples.sh
+```
+
 ## R Scripts
 In this repository, we also provide a bunge of R scripts for plotting the results of HyperLAU, or for preparing or manipulating the input data. 
 
 ### random_qm.R
 This script can be used to insert a certain amount of randomly uniform distributed "?" into an input dataset, as we did for the different case studies in the article introducing HyperLAU. The only required R library for running this script is `stringr`. Running the first part of the script inserts "?" in the whole dataset, i.e. at all positions in the string, whereas the second part does this only for a certain specified feature. In both cases one has to specify the input data set in the `read.table()` function, as well as the length of the binary strings `L`, the probability with which a position in the binary strings should be replaced by a "?" (this is done via the parameter `threshold`) and the name under which the manipulated data set should be saved (in the `write.table()` function). In the second case, when you want the "?" to be only in one certain feature, you have to specify the number of the position of this feature in the binary string (parameter `feature`). 
 
-### reconstruct.R
-This script can be used to reconstruct the input format HyperLAU expects from the output provided by PHYLIP. The required R libraries for running this script are `phytools` and `phangorn`. There are three parameters one has to specify at the top of the script: `input.trees`(output of PHYLIP which contains the information about the phylogenetic tree), `input.data` (the original cross-sectional data set that was used by PHYLIP to create the phylogenetic tree) and `output.data` (name under which the reconstructed file in the input format for HyperLAU should get). 
 
-### plotting_HyperLAU_results.R
-This script contains all function that we used to produce the figures in the article introducing HyperLAU. The required R libraries for running this script are `ggplot2`, `ggraph`. `igraph`, `stringr` and `ggpubr`. 
+### plot_HyperLAU_results.R
+This script gives examples how to create the different types of plots we presented in the preprint. All needed input parameters that need to be specified, as well as the function that must be called to create the plot. The corresponding functions are contained in the file `plotting_functions.R`, so make sure that this file is saved in the working direction. Then the different commands for creating the plots can directly be executed here in this file. 
 
-The first three functions `BinToDec`, `DecToBin` and `DecToBinV` are just functions that are needed by the actual plotting functions, for converting binary strings in integer and vice versa. 
-
-The function `plot_embedded_hypercube` is the function that plots the learned transitions pathways embedded in the full hypercube. 
-
-The function `data_vis` is the function that plots the visualisation of the presence, absence and uncertainty in the phylogenetic input data. The only input parameter is the name of the input data set. 
+### plotting_function.R
+Contains all the functions that are needed to create the different plots we presented in the article. For examples how to execute them, see `plot_HyperLAU_results.R`.
 
 ## Data
 In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 
 
+The file `first_toyexample.txt`contains the very small example with string length three, we discussed first in the article. 
+
 In the subfolder `second_toyexample` there are the full dataset `full.txt` (all positions in all datapoints are specified as $0$ or $1$) we used for our second toy example among the ones where we inserted with a probability of $0.4$ uncertainty markers ("?") into a certain feature. 
 
-The subfolder `tb` contains all three datasets we used for the tuberculosis case studies. `tb_data_10.txt` contains the phylogeny reconstructed by considering only the datapoints of string length ten containing no missing states. Into this dataset, we inserted uncertainty markers ("?") with a probability of $0.5$ at all positions, which is the dataset `tb_data_10_qm50.txt`. The phylogenetic reconstruction (by PHYLIP) of the original data set of string length ten including also data points with missing states is stored as `phylo_tb_10.txt`. 
+The subfolder `tb` contains both datasets we used for the tuberculosis case studies. `tb_data_10.txt` contains the phyloegeny reconstructed by considering only the datapoints of string length ten containing no missing states. Into this dataset, we inserted uncertainty markers ("?") with a probability of $0.5$ at all positions, which is the dataset `tb_data_10_qm50.txt`. 

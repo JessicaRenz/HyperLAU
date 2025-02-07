@@ -1,9 +1,9 @@
 require(stringr)
 
 #uniform distributed questionmarks in the whole dataset
-data = read.table("tb_data_9.txt",colClasses = c("character", "character"))
-L = 9
-threshold = 0.5
+data = read.table("tb_data_10.txt",colClasses = c("character", "character"))
+L = 10
+threshold = 0.5   #approximately this amount of positions will be replaced by a ?
 
 length = nrow(data)
 for (i in 1:length){
@@ -22,13 +22,13 @@ for (i in 1:length){
   }
 }
 
-write.table(data, "tb_data_9_qm50.txt", row.names=FALSE, quote=FALSE)
+write.table(data, "tb_data_10_qm50.txt", row.names=FALSE, quote=FALSE)
 
 #uniform distributed questionmarks at a specific position
 data.2 = read.table("full.txt", colClasses = c("character","character"))
 L = 6
-feature = 6
-threshold = 0.1
+feature = 1   #specify the position in which the uncertainty markers will be inserted
+threshold = 0.4 #in approximately this amount of strings the specified position will be replaced by a ?
 
 length = nrow(data.2)
 for (i in 1:length){
@@ -45,4 +45,4 @@ for (i in 1:length){
   }
 }
 
-write.table(data.2, "feature6_10.txt", row.names=FALSE, quote=FALSE)
+write.table(data.2, "feature1_40.txt", row.names=FALSE, quote=FALSE)

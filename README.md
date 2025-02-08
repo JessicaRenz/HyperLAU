@@ -8,7 +8,7 @@ Hypercubic transition paths with Linear Algebra for Uncertainty: Inference of ac
 ## Requirements
 For running HyperLAU, you need the ability to compile and run C++ code, and having the library `armadillo` installed. 
 
-For running the plotting tools as well as the tools to reconstruct a HyperLAU input dataset from the output of PHYLIP, you need R with the following libraries: 
+For running the plotting tools as well as the tools to manipulate the input datasets, you need R with the following libraries: 
 `ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph` and `dplyr`.
 
 ## Running HyperLAU

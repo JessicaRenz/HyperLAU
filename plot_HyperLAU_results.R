@@ -62,3 +62,12 @@ sd_yn = "Y" #do you want to plot the standard deviation derived from bootstrap r
 
 plot.5 = skeleton_plot(label1,label2,sd_yn)
 plot.5
+
+# 6. Visualisation of the transitions as Pie-charts
+
+#input that needs to be specified
+data = "independent-transitions_all0.txt" #name of the data file
+L = 10 # number of considered features
+
+plot.6 = pie_charts(data,L)
+plot.6

@@ -9,7 +9,7 @@ Hypercubic transition paths with Linear Algebra for Uncertainty: Inference of ac
 For running HyperLAU, you need the ability to compile and run C++ code, and having the library `armadillo` installed. 
 
 For running the plotting tools as well as the tools to manipulate the input datasets, you need R with the following libraries: 
-`ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph` and `dplyr`.
+`ggplot2` , `stringr`, `ggraph`, `ggpubr`, `igraph`, `ggrepel`, `readxl`, `tidyr` and `dplyr`.
 
 ## Running HyperLAU
 HyperLAU can be compiled in the command line, for example by the following command:
@@ -60,6 +60,9 @@ This script gives examples how to create the different types of plots we present
 
 ### plotting_function.R
 Contains all the functions that are needed to create the different plots we presented in the article. For examples how to execute them, see `plot_HyperLAU_results.R`.
+
+### prepare_and_plot_phylogeny.R
+This script was used to create and draw the phylogeny of the whole tuberculosis dataset (including uncertainties) that was used in the paper. 
 
 ## Data
 In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 

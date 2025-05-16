@@ -4,10 +4,10 @@ source("plotting_functions.R")
 # 1. plots the learned fluxes over a specified threshold embedded in the full hypercube
 
 #input that needs to be specified
-label = "toy5_m-1"  #f.e. for the HyperLAU output with "transitions_tb_data_10.txt", the label will be "tb_data_10"
+label = "first_toyexample_mF"  #f.e. for the HyperLAU output with "transitions_tb_data_10.txt", the label will be "tb_data_10"
 L = 3  #string length
 thresh = 0.05 # specified threshold, f.e. when set to 0.05, all fluxes that are bigger than 0.05 will be plotted. 
-sd_yn = "Y" #do you want to plot the standard deviation derived from bootstrap results? to be specified with "Y" or "N"
+sd_yn = "N" #do you want to plot the standard deviation derived from bootstrap results? to be specified with "Y" or "N"
 
 plot.1 = plot_embedded_hypercube(label,L,thresh,sd_yn)
 print(plot.1)
@@ -17,7 +17,7 @@ print(plot.1)
 #2. creates the node to node graph with nodes labeled by the antibiotics considered in the tuberculosis example
 
 #input that needs to be specified
-file = "transitions_toy5_m-1.txt"  #name of the file containing the transition probabilities
+file = paste0("transitions_", label, ".txt", collapse="")  #name of the file containing the transition probabilities
 L = 3 #string length
 labels = c("INH","RIF","PZA")  #vector containing the labels of the feature in the corresponding order"
 

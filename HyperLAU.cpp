@@ -654,26 +654,80 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 
 int main(int argc, char**argv){
-// arguments: [name of the input file] [string length] [name of the output file] [number of bootstraps] [number for a random seed] [model] [denom]
-        const int expectedArgs = 8;
+// arguments: [name of the input file] [name of the output file] [number of bootstraps] [number for a random seed] [model] [denom]
+        const int expectedArgs = 7;
         
         if(argc != expectedArgs){
-                std::cerr << "Non-valid number of arguments.\nUsage: " << argv[0] << "[name of input file] [string length] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]\n\n";
+                std::cerr << "Non-valid number of arguments.\nUsage: " << argv[0] << "[name of input file] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]\n\n";
 
-		printf("[name of input file]\n\tName of the file that contains the input data, including possible extensions like .txt. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example 01? 011. Both states are encoded by binary strings, but can contain one or more ? to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.\n\n[string length]\n\tNumber of features to consider, has to be an integer matching the number of features in the input file.\n\n[label for the output files]\n\tHyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files best_likelihood_[name of the output file].txt and transitions_[name of the output file].txt. If the number of bootstrap resamples is specified as > 0 , you will also get two additional files called mean_[name of the output file].txtand sd_[name of the output file].txt.\n\n[number of bootstrap resamples]\n\tNumber of resamples to simulated. If specified as 0, no bootstrapping will be done.\n\n[random seed]\n\tSpecifies the integer random seed to use for simulations.\n\n[model]\n\tHas to be one of the following integers: -1 , 1 , 2 , 3 , 4 . With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model -1 corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as F for full. In model 1, every feature occurs with a fixed rate, independent of other features already obtained. In model 2 there are already pairwise interactions allowed, and in model 3 and 4, pairs or triples can influence the probability of features to occur next, respectively.\n\n[annealing rate]\n\tThis parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: temp = temp/denom. This parameter should be a double > 1 (e.g. 1.001).\n\n");
+		printf("[name of input file]\n\tName of the file that contains the input data, including possible extensions like .txt. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example 01? 011. Both states are encoded by binary strings, but can contain one or more ? to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.\n\n[label for the output files]\n\tHyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files best_likelihood_[name of the output file].txt and transitions_[name of the output file].txt. If the number of bootstrap resamples is specified as > 0 , you will also get two additional files called mean_[name of the output file].txtand sd_[name of the output file].txt.\n\n[number of bootstrap resamples]\n\tNumber of resamples to simulated. If specified as 0, no bootstrapping will be done.\n\n[random seed]\n\tSpecifies the integer random seed to use for simulations.\n\n[model]\n\tHas to be one of the following integers: -1 , 1 , 2 , 3 , 4 . With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model -1 corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as F for full. In model 1, every feature occurs with a fixed rate, independent of other features already obtained. In model 2 there are already pairwise interactions allowed, and in model 3 and 4, pairs or triples can influence the probability of features to occur next, respectively.\n\n[annealing rate]\n\tThis parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: temp = temp/denom. This parameter should be a double > 1 (e.g. 1.001).\n\n");
                 return 1;
         }
 	
-	L= atoi(argv[2]);
 	string file_name = argv[1];
-	string out_name = argv[3];
-	int bootstrap = atoi(argv[4]);
-	int seed = atoi(argv[5]);
+	string out_name = argv[2];
+	int bootstrap = atoi(argv[3]);
+	int seed = atoi(argv[4]);
 	srand48(seed);
-	int model = atoi(argv[6]);
-	double denom = atof(argv[7]);
+	int model = atoi(argv[5]);
+	double denom = atof(argv[6]);
 	
 	
+	
+	printf("Reading in data \n");
+	//read in the data
+	ifstream in(file_name);
+    	vector<string> data;
+    	while(getline(in, str)){
+        	if(str.size()>0){
+            		data.push_back(str);
+        	}
+    	}
+    	in.close();
+    	
+    	
+    	if(data.empty()){
+    		printf("Formal error in dataset\n");
+      		exit(1);
+    	}
+    	
+    	vector<int> frequ;
+    	vector<string> reduced_data = red_data(data,frequ);
+    	
+    	
+    	string first_row = reduced_data[0];
+    	L = first_row.find(' ');
+    	cout << "L: " << L << endl;
+    		
+	for (int i = 0; i<pow(2,L); i++){
+		string x = number2binary(i,L);
+		R.push_back(x);
+  	}
+  	
+  	
+    	string S;
+	vector<string> all;
+
+    	for(int i =0; i < reduced_data.size(); i++){
+    		S = reduced_data[i];
+    		stringstream ss(S);
+    		string word;
+        	while (ss >> word) { // Extract word from the stream.
+        		all.push_back(word);
+    		}
+  	}
+
+  	string next;
+  	vector<string> before;
+  	vector<string> after;
+  	for(int j = 0; j < all.size(); j++){
+  		next = all[j];
+		if (j % 2 == 0){
+			before.push_back(next);
+		} else{
+			after.push_back(next);
+		}
+  	}
 	
 	cout << "Inference started with dataset " << file_name << " under model " << model << " with " << bootstrap << " bootstrap resamples" << endl;
 
@@ -718,55 +772,7 @@ int main(int argc, char**argv){
 		best_mat = rate_matrix;
 	}
 	
-	printf("Reading in data \n");
-	//read in the data
-	ifstream in(file_name);
-    	vector<string> data;
-    	while(getline(in, str)){
-        	if(str.size()>0){
-            		data.push_back(str);
-        	}
-    	}
-    	in.close();
-    	
-    	
-    	if(data.empty()){
-    		printf("Formal error in dataset\n");
-      		exit(1);
-    	}
-    	
-    	vector<int> frequ;
-    	vector<string> reduced_data = red_data(data,frequ);
-    		
-	for (int i = 0; i<pow(2,L); i++){
-		string x = number2binary(i,L);
-		R.push_back(x);
-  	}
-  	
-  	
-    	string S;
-	vector<string> all;
-
-    	for(int i =0; i < reduced_data.size(); i++){
-    		S = reduced_data[i];
-    		stringstream ss(S);
-    		string word;
-        	while (ss >> word) { // Extract word from the stream.
-        		all.push_back(word);
-    		}
-  	}
-
-  	string next;
-  	vector<string> before;
-  	vector<string> after;
-  	for(int j = 0; j < all.size(); j++){
-  		next = all[j];
-		if (j % 2 == 0){
-			before.push_back(next);
-		} else{
-			after.push_back(next);
-		}
-  	}
+	
   	
   	//Simulated annealing 
 	vector<double> prog_best_lik;

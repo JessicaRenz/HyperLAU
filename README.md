@@ -18,19 +18,26 @@ g++ HyperLAU.cpp -o HyperLAU -larmadillo
 ```
 After compiling, HyperLAU can be runned directly from the command line by specifying the following input parameters:
 ```
-./HyperLAU [name of input file] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]
+./HyperLAU [name of input file] [label for output files] 
 ```
-The following command, for example, will run a dataset called `data.txt` and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
+The name of the input file and the label for the output files are the only two necessary input arguments. 
+
+Additionally, you can costumize the simulation by setting some additionally flags, that are set to a specific value by default:
+```
+./HyperLAU [name of input file] [label for output files] --bootstrap [number of bootstrap resamples] --seed [random seed] --model [model structure] --rate [annealing rate]
+```
+
+The command below, for example, will run a dataset called `data.txt` and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
 ```
 ./HyperLAU data.txt data 0 1 -1 1.001
 ```
 
 - **name of input file** Name of the file that contains the input data, including possible extensions like `.txt`. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example `01? 011`. Both states are encoded by binary strings, but can contain one or more `?` to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.
-- **label for output files** HyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is specified as $>0$, you will also get two additional files called `mean_[name of the output file].txt`and `sd_[name of the output file].txt`.
-- **number of bootstrap resamples** If specified as 0, no bootstrapping will be done.
-- **number of random seed** Here you can specify the random seed you want to use for your simulations. Has to be an integer. Has to be specified, no underlying default value.
-- **model structure** Has to be one of the following integers: $-1,1,2,3,4$. With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model $-1$ corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as $F$ for "full". In model $1$, every feature occurs with a fixed rate, independent of other features already obtained. In model $2$ there are already pairwise interactions allowed, and in model $3$ and $4$, pairs or triples can influence the probability of features to occur next, respectively.
-- **annealing rate** This parameter specifies, how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: `temp = temp/denom`. This parameter should be a double $>1$.
+- **label for output files** HyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is specified as $>0$, you will also get two additional files called `mean_[name of the output file].txt` and `sd_[name of the output file].txt`.
+- **number of bootstrap resamples** Number of resamples to simulate. If specified as 0, no bootstrapping will be done. Optional argument. Default value: 0.
+- **number of random seed** Specifies the integer random seed to use for simulations. Optional argument. Default value: 1.
+- **model structure** Has to be one of the following integers: $-1,1,2,3,4$. With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model $-1$ corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as $F$ for "full". In model $1$, every feature occurs with a fixed rate, independent of other features already obtained. In model $2$ there are already pairwise interactions allowed, and in model $3$ and $4$, pairs or triples can influence the probability of features to occur next, respectively. Optional argument. Default value: -1.
+- **annealing rate** This parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: `temp = temp/rate`. This parameter should be a double $>1$. Optional argument. Default value: 1.001.
 
 ## Output
 HyperLAU does always output the two text files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is chosen to be bigger than zero, it outputs two additional files `mean_[name of the output file].txt`and `sd_[name of the output file].txt`, as well as a file `bootstrap_[bootstrap number]_[name of the outpu file].txt` for every bootstrap resample.

@@ -18,15 +18,14 @@ g++ HyperLAU.cpp -o HyperLAU -larmadillo
 ```
 After compiling, HyperLAU can be runned directly from the command line by specifying the following input parameters:
 ```
-./HyperLAU [name of input file] [string length] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]
+./HyperLAU [name of input file] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]
 ```
-The following command, for example, will run a dataset called `data.txt` containing strings of length six and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
+The following command, for example, will run a dataset called `data.txt` and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
 ```
-./HyperLAU data.txt 6 data 0 1 -1 1.001
+./HyperLAU data.txt data 0 1 -1 1.001
 ```
 
 - **name of input file** Name of the file that contains the input data, including possible extensions like `.txt`. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example `01? 011`. Both states are encoded by binary strings, but can contain one or more `?` to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.
-- **string length** Number of features to consider, has to be an integer matching the number of features in the input file.
 - **label for output files** HyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files `best_likelihood_[name of the output file].txt` and `transitions_[name of the output file].txt`. If the number of bootstrap resamples is specified as $>0$, you will also get two additional files called `mean_[name of the output file].txt`and `sd_[name of the output file].txt`.
 - **number of bootstrap resamples** If specified as 0, no bootstrapping will be done.
 - **number of random seed** Here you can specify the random seed you want to use for your simulations. Has to be an integer. Has to be specified, no underlying default value.

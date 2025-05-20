@@ -655,25 +655,45 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 int main(int argc, char**argv){
 // arguments: [name of the input file] [name of the output file] [number of bootstraps] [number for a random seed] [model] [denom]
-        const int expectedArgs = 7;
+        const int expectedArgs = 3;
         
-        if(argc != expectedArgs){
-                std::cerr << "Non-valid number of arguments.\nUsage: " << argv[0] << "[name of input file] [label for output files] [number of bootstrap resamples] [random seed] [model structure] [annealing rate]\n\n";
+        if(argc < expectedArgs){
+                std::cerr << "Non-valid number of arguments.\nUsage: " << argv[0] << " [name of input file] [label for output files] Optional arguments: --bootstrap [number of bootstrap resamples] --seed [random seed] --model [model structure] --rate [annealing rate]\n\n";
 
-		printf("[name of input file]\n\tName of the file that contains the input data, including possible extensions like .txt. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example 01? 011. Both states are encoded by binary strings, but can contain one or more ? to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.\n\n[label for the output files]\n\tHyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files best_likelihood_[name of the output file].txt and transitions_[name of the output file].txt. If the number of bootstrap resamples is specified as > 0 , you will also get two additional files called mean_[name of the output file].txtand sd_[name of the output file].txt.\n\n[number of bootstrap resamples]\n\tNumber of resamples to simulated. If specified as 0, no bootstrapping will be done.\n\n[random seed]\n\tSpecifies the integer random seed to use for simulations.\n\n[model]\n\tHas to be one of the following integers: -1 , 1 , 2 , 3 , 4 . With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model -1 corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as F for full. In model 1, every feature occurs with a fixed rate, independent of other features already obtained. In model 2 there are already pairwise interactions allowed, and in model 3 and 4, pairs or triples can influence the probability of features to occur next, respectively.\n\n[annealing rate]\n\tThis parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: temp = temp/denom. This parameter should be a double > 1 (e.g. 1.001).\n\n");
+		printf("[name of input file]\n\tName of the file that contains the input data, including possible extensions like .txt. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example 01? 011. Both states are encoded by binary strings, but can contain one or more ? to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.\n\n[label for the output files]\n\tHyperLAU will output several text-files. With this input parameter, you can specify the basis of the names of all these outputs. For every run, you will get the two output files best_likelihood_[name of the output file].txt and transitions_[name of the output file].txt. If the number of bootstrap resamples is specified as > 0 , you will also get two additional files called mean_[name of the output file].txtand sd_[name of the output file].txt.\n\n[number of bootstrap resamples]\n\tNumber of resamples to simulated. If specified as 0, no bootstrapping will be done. This argument is optional. Default value: 0.\n\n[random seed]\n\tSpecifies the integer random seed to use for simulations. This argument is optional. Default: 1.\n\n[model]\n\tHas to be one of the following integers: -1 , 1 , 2 , 3 , 4 . With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model -1 corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as F for full. In model 1, every feature occurs with a fixed rate, independent of other features already obtained. In model 2 there are already pairwise interactions allowed, and in model 3 and 4, pairs or triples can influence the probability of features to occur next, respectively. This parameter is optional. Default: -1.\n\n[annealing rate]\n\tThis parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: temp = temp/rate. This parameter should be a double > 1 (e.g. 1.001). It is optional. Default: 1.001.\n\n");
                 return 1;
         }
+      
 	
 	string file_name = argv[1];
 	string out_name = argv[2];
-	int bootstrap = atoi(argv[3]);
-	int seed = atoi(argv[4]);
+	
+	//default values for parameters
+	int bootstrap = 0;
+	int seed = 1;
 	srand48(seed);
-	int model = atoi(argv[5]);
-	double denom = atof(argv[6]);
+	int model = -1;
+	double denom = 1.001;
+    
 	
-	
-	
+	for(int i = 3; i < argc; i=i+2){
+	  if(string(argv[i]) == "--bootstrap"){
+	    bootstrap = atoi(argv[i+1]);
+	  } else if(string(argv[i]) == "--seed"){
+	    seed = atoi(argv[i+1]);
+	    srand48(seed);
+	  } else if(string(argv[i]) == "--model"){
+	    model = atoi(argv[i+1]);
+	  } else if(string(argv[i]) == "--rate"){
+	    denom = atof(argv[i+1]);
+	  } else{
+	    cout << "Can't interpret argument " << i << " in the input. Optional arguments: --bootstrap [number of bootstrap resamples] --seed [random seed] --model [model structure] --rate [annealing rate]" << endl;
+	    printf("\n\n[number of bootstrap resamples]\n\tNumber of resamples to simulated. If specified as 0, no bootstrapping will be done. Default value: 0.\n\n[random seed]\n\tSpecifies the integer random seed to use for simulations. Default: 1.\n\n[model]\n\tHas to be one of the following integers: -1 , 1 , 2 , 3 , 4 . With this input parameter you choose which model, i.e. what degree of allowed interaction between the features should be used. Model -1 corresponds to the model of arbitrary dependencies, where all combinations of features can influence each other. In the article introducing HyperLAU it is labeled as F for full. In model 1, every feature occurs with a fixed rate, independent of other features already obtained. In model 2 there are already pairwise interactions allowed, and in model 3 and 4, pairs or triples can influence the probability of features to occur next, respectively. Default: -1.\n\n[annealing rate]\n\tThis parameter specifies how fast the temperature in the Simulated Annealing Process should be decreased. After every optimization loop, the current temperature is devided by this parameter: temp = temp/rate. This parameter should be a double > 1 (e.g. 1.001). Default: 1.001.\n\n");
+	    exit(1);
+	  }
+	}
+
+    
 	printf("Reading in data \n");
 	//read in the data
 	ifstream in(file_name);
@@ -697,7 +717,6 @@ int main(int argc, char**argv){
     	
     	string first_row = reduced_data[0];
     	L = first_row.find(' ');
-    	cout << "L: " << L << endl;
     		
 	for (int i = 0; i<pow(2,L); i++){
 		string x = number2binary(i,L);
@@ -729,7 +748,7 @@ int main(int argc, char**argv){
 		}
   	}
 	
-	cout << "Inference started with dataset " << file_name << " under model " << model << " with " << bootstrap << " bootstrap resamples" << endl;
+	cout << "Inference started with dataset " << file_name << " under model " << model << " with " << bootstrap << " bootstrap resamples. Used random seed: " << seed <<". Annealing rate: " << denom << endl;
 
 	//initialising the rate matrix
 	int num_param = pow(L,model);

@@ -105,7 +105,15 @@ void possible_transitions(vector<int>& n_partners, vector<int>& cumulative_partn
 	}
 }
 
-// a function that removes duplications in the input data and counts how often they occured in the original dataset
+/* This function removes duplications in the input data but counts and stores how often they occurred in the original dataset
+ Input variables: 
+ - vector<string> original data: contains the rows of the input dataset as they are
+ - vector<int> frequencies: empty vector in which the frequencies can be stored
+ Output:
+ - vector<string> unique_data: contains the rows of the input dataset after removing duplications
+ - vector<int> frequencies: contains the number indicating how often the corresponding data point was contained in the original dataset, stored in the appropriate order to the order of the data points in the vector unique_data
+ */
+ 
 vector<string> red_data(vector<string> original_data, vector<int>& frequencies) {
     	vector<string> unique_data;
     	unordered_map<string, int> frequency;
@@ -127,7 +135,14 @@ vector<string> red_data(vector<string> original_data, vector<int>& frequencies) 
 }
 
 
-//creates a uniform rate matrix, as an initial input, with a base rate of 1 for every feature and 0 for all other pairwise interactions
+/*creates a uniform rate matrix (stored as a vector), as an initial guess, with a base rate of 1 for every feature and 0 for all other pairwise interactions. Only for the models 1,2,3 and 4.
+Input:
+- vector<double> rate_matrix: zero vector of length corresponding to the number of parameters (L^model)
+- int model: the integer indicating which model is used (for the models 1,2,3 and 4)
+- int L: integer indicating the number of features under consideration (length of the binary strings)
+Output: 
+- vector<double> rate_matrix: contains a 1 in all entries corresponding to the base rate of a feature and a 0 in all other entries.
+*/
 void uniform_rate_matrix(vector<double>& rate_matrix, int model, int L){
 
 	if (model == 1){
@@ -147,9 +162,8 @@ void uniform_rate_matrix(vector<double>& rate_matrix, int model, int L){
 			rate_matrix[i*L*L*L] = 1;
 		}
 	}else if (model == -1){
-		for (int i = 0; i < L; i++){
-			rate_matrix[i*pow(2,L)] = 1;
-		}
+		printf("There is something wrong with building the initial matrix for model -1 \n");
+		exit(1);
 	}else{
 		printf("Invalid value for model \n");
       		exit(1);
@@ -191,7 +205,16 @@ void uniform_transition_matrix(arma::vec& A_val, arma::vec& A_row_ptr, arma::vec
 	}
 }
 
-//calculates the rate for an transition from j to i
+/*function that calculates the rate for an transition from node j to node i in the hypercube
+Input: 
+- int i: integer representation of the node in the hypercube that is the destination of the transition
+- int j: integer representation of the node in the hypercube that is the origin of the transition
+- vector<double> x_current: vector that contains the transition rates used for model 1,2,3 and 4
+- int L: integer indicating the number of features under consideration (length of the binary strings)
+- int model: the integer indicating which model is used (for the models 1,2,3 and 4)
+Output:
+- double rate: rate of the considered transition
+*/
 double rate(int i, int j, vector<double> x_current, int L, int model){
 
 	double rate = 0;
@@ -255,7 +278,15 @@ double rate(int i, int j, vector<double> x_current, int L, int model){
 	return rate;
 }
 
-//transforms an vector with transition rates into the form of a matrix including transition probabilities
+/*transforms an vector with transition rates into the form of a matrix containing transition probabilities
+Input:
+- int L: integer indicating the number of features under consideration (length of the binary strings)
+- vector<double> x_current: vector that contains the transition rates used for model 1,2,3 and 4
+- int model: the integer indicating which model is used (for the models 1,2,3 and 4)
+- mat mat_temp: zero matrix of the size 2^L x 2^L
+Output:
+- mat mat_temp: matrix containing transition probabilities based on the given transition rates
+*/
 void build_trans_matrix(int L, vector<double> x_current, int model, mat& mat_temp){
 	for (int j = 0; j< pow(2,L); j++){
 		for (int i = 0; i < pow(2,L); i++){
@@ -279,7 +310,17 @@ void build_trans_matrix(int L, vector<double> x_current, int model, mat& mat_tem
 	}
 }
 
-// calculates the log-likelihood to see a the data given a rate vector
+/* calculates the log-likelihood of seeing the input data given a certain rate vector for the models 1,2,3 and 4
+Input: 
+-vector<string> before: vector containing all ancestor states (in string format) of the input data
+-vector<string> after: vector containing all descendant states (in string format) of the input data (in appropriate order to the vector "before")
+-vector<int> frequ: vector containing the frequencies of the occurrence of a corresponding ancestor - descendant combinations in the original dataset (in appropriate order to the vectors "before" and "after".) 
+-int L: integer indicating the number of features under consideration (length of the binary strings)
+-vector<double> x_current: vector that contains the transition rates used for model 1,2,3 and 4
+-int model: the integer indicating which model is used (for the models 1,2,3 and 4)
+Output:
+- double that indicates the log-likelihood of seeing the input data given the rate vector x_current
+*/
 double loglh(vector<string> before, vector<string> after, vector<int> frequ, int L, vector<double> x_current, int model){
 
 	vec loglh(before.size(), fill::zeros);
@@ -400,8 +441,16 @@ double loglh(vector<string> before, vector<string> after, vector<int> frequ, int
 
 }
 
-
-// calculates the log-likelihood to see a the data given a transition matrix 
+/* calculates the log-likelihood of seeing the input data given a certain transition matrix for the model F (-1)
+Input: 
+-vector<string> before: vector containing all ancestor states (in string format) of the input data
+-vector<string> after: vector containing all descendant states (in string format) of the input data (in appropriate order to the vector "before")
+-vector<int> frequ: vector containing the frequencies of the occurrence of a corresponding ancestor - descendant combinations in the original dataset (in appropriate order to the vectors "before" and "after") 
+-int L: integer indicating the number of features under consideration (length of the binary strings)
+- mat x_current: matrix of size 2^L x 2^L containing transition probabilities
+Output:
+- double that indicates the log-likelihood of seeing the input data given the transition matrix x_current
+*/
 double loglh_minus_1(vector<string> before, vector<string> after, vector<int> frequ, int L, mat x_current){
 
 //Calculate the new likelihood given the new matrix
@@ -527,7 +576,21 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 
 }
 
-//performs the simulated annealing for model 1 - 4 (based on a rate vector)
+/*performs the simulated annealing process for model 1 - 4 (based on a rate vector)
+Input: 
+- vector<double> x_initial: vector that contains the initial transition rates with which the simulated annealing process should be started
+- vector<double> best_mat: vector that contains the best transition rates found so far (at this point usually the same as x_initial)
+- int L: integer indicating the number of features under consideration (length of the binary strings)
+- vector<string> before: vector containing all ancestor states (in string format) of the input data
+- vector<string> after: vector containing all descendant states (in string format) of the input data (in appropriate order to the vector "before")
+- vector<int> frequ: vector containing the frequencies of the occurrence of a corresponding ancestor - descendant combinations in the original dataset (in appropriate order to the vectors "before" and "after")
+- int model: the integer indicating which model is used (for the models 1,2,3 and 4)
+- vector<double> prog_best_lik: empty vector
+- double denom: simulating annealing rate. At the end of every simulated annealing loop, the temperature is divided by this number
+Output:
+- vector<double> best_mat: vector containing the best transition rates that were found in order to optimize the likelihood function
+- vector<double> prog_best_lik: vector containing the log-likelihoods for every simulated annealing loop
+*/
 void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
 	double temp = 1;
 	vector<double> x_old = x_initial;
@@ -581,8 +644,21 @@ void simulated_annealing(vector<double> x_initial, vector<double>& best_mat, int
   	}
 }
 
-//performs simulated annealing for model -1 (based on a transition matrix)
-void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, int model, vector<double>& prog_best_lik, double denom){
+/*performs the simulated annealing process for model F (-1) (based on a transition matrix)
+Input: 
+- mat x_initial: matrix that contains the initial transition probabilities with which the simulated annealing process should be started
+- mat best_mat: matrix that contains the best transition probabilities found so far (at this point usually the same as x_initial)
+- int L: integer indicating the number of features under consideration (length of the binary strings)
+- vector<string> before: vector containing all ancestor states (in string format) of the input data
+- vector<string> after: vector containing all descendant states (in string format) of the input data (in appropriate order to the vector "before")
+- vector<int> frequ: vector containing the frequencies of the occurrence of a corresponding ancestor - descendant combinations in the original dataset (in appropriate order to the vectors "before" and "after")
+- vector<double> prog_best_lik: empty vector
+- double denom: simulating annealing rate. At the end of every simulated annealing loop, the temperature is divided by this number
+Output:
+- mat best_mat: matrix containing the best transition probabilities that were found in order to optimize the likelihood function
+- vector<double> prog_best_lik: vector containing the log-likelihoods for every simulated annealing loop
+*/
+void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<string> before, vector<string> after, vector<int> frequ, vector<double>& prog_best_lik, double denom){
 	double temp = 1;
 	mat x_old = x_initial;
 	mat x_current = x_initial;
@@ -654,7 +730,8 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 
 int main(int argc, char**argv){
-// arguments: [name of the input file] [name of the output file] [number of bootstraps] [number for a random seed] [model] [denom]
+        
+        //consistency check, if all necessary arguments are specified via the command line, if not print a description of how to use HyperLAU
         const int expectedArgs = 3;
         
         if(argc < expectedArgs){
@@ -664,7 +741,7 @@ int main(int argc, char**argv){
                 return 1;
         }
       
-	
+	// setting parameters
 	string file_name = argv[1];
 	string out_name = argv[2];
 	
@@ -693,7 +770,7 @@ int main(int argc, char**argv){
 	  }
 	}
 
-    
+        // Reading in data
 	printf("Reading in data \n");
 	//read in the data
 	ifstream in(file_name);
@@ -711,13 +788,15 @@ int main(int argc, char**argv){
       		exit(1);
     	}
     	
+    	// check for duplications 
     	vector<int> frequ;
     	vector<string> reduced_data = red_data(data,frequ);
     	
-    	
+    	// setting L to the string length (= number of considered features)
     	string first_row = reduced_data[0];
     	L = first_row.find(' ');
-    		
+    	
+    	// store the input data in different vectors that can be used by the algorithm
 	for (int i = 0; i<pow(2,L); i++){
 		string x = number2binary(i,L);
 		R.push_back(x);
@@ -754,6 +833,7 @@ int main(int argc, char**argv){
 	int num_param = pow(L,model);
 	vector<double> rate_vec(num_param, 0.0);
 	arma::mat rate_matrix(pow(2,L),pow(2,L), arma::fill::zeros);
+  
 	if (model != -1){
 		uniform_rate_matrix(rate_vec, model, L);
 	}else{
@@ -761,7 +841,7 @@ int main(int argc, char**argv){
 		arma::vec A_row_ptr(pow(2,L)+1, arma::fill::zeros);
 		arma::vec A_col_idx(pow(2,L-1)*L, arma::fill::zeros);
 
-		//Calculation of the values in the transition matrix and corresponding informations about their placement
+		//Calculation of the values in the transition matrix and corresponding information about their placement
 		uniform_transition_matrix(A_val, A_row_ptr, A_col_idx, L);
 		
 
@@ -778,7 +858,7 @@ int main(int argc, char**argv){
 		}
 	}
 	
-
+        // transform the rate matrix into the needed form. Models 1-4 deal with a vector form of the matrix, model F (-1) deals with a matrix
 	vector<double> x_initial_vec;
 	vector<double> best_vec;
 	mat x_initial;
@@ -799,9 +879,10 @@ int main(int argc, char**argv){
 	if (model != -1){
 		simulated_annealing(x_initial_vec, best_vec, L, before, after, frequ, model, prog_best_lik, denom);
 	}else{
-		simulated_annealing_minus_1(x_initial, best_mat, L, before, after, frequ, model, prog_best_lik, denom);
+		simulated_annealing_minus_1(x_initial, best_mat, L, before, after, frequ, prog_best_lik, denom);
 	}
 
+        // get the final transition matrix
 	mat final_trans_matrix(pow(2,L), pow(2,L), fill::zeros);
 	if (model !=-1){
 		build_trans_matrix(L, best_vec, model, final_trans_matrix);
@@ -809,7 +890,7 @@ int main(int argc, char**argv){
 		final_trans_matrix = best_mat;
 	}
 	
-	//final probability distribution
+	// get the final probability distribution
 	mat P_fin(pow(2,L),L+1, fill::zeros);
 	P_fin(0,0) = 1;
 	for (int t = 1; t<=L; t++){
@@ -861,6 +942,8 @@ int main(int argc, char**argv){
 	if (bootstrap != 0){
   		for (int i = 1; i<=bootstrap; i++){
   			cout << "Bootstrap " << i << endl;
+  			
+  			//create a new resampled data set for every bootstrap loop and store the data in different vectors
   			string d_bt;
   			vector<string> data_bt;
   			for (int j = 0; j<l; j++){
@@ -895,7 +978,8 @@ int main(int argc, char**argv){
 					after_bt.push_back(next_bt);
 				}
   			}
-
+                        
+                        // Simulated annealing process
   			vector<double> prog_best_lik_bt;
   			vector<double> best_vec_bt;
   			mat best_mat_bt;
@@ -906,7 +990,7 @@ int main(int argc, char**argv){
   				build_trans_matrix(L,best_vec_bt,model, best_trans_mat_bt);
   			}else{
   				best_mat_bt = x_initial;
-  				simulated_annealing_minus_1(x_initial, best_mat_bt, L, before_bt, after_bt, frequ_bt, model, prog_best_lik_bt, denom);
+  				simulated_annealing_minus_1(x_initial, best_mat_bt, L, before_bt, after_bt, frequ_bt, prog_best_lik_bt, denom);
   				best_trans_mat_bt = best_mat_bt;
   			}
 			for (int j = 0; j < pow(2,L); j++) {
@@ -947,6 +1031,7 @@ int main(int argc, char**argv){
   			bt.close();
 		}
 
+                // Calculating the mean of all bootstrap resamples for every entry in the transition matrix
 		mat mean(pow(2,L),pow(2,L),fill::zeros);
     		//calculating the mean
     		for (int j = 0; j<pow(2,L); j++){
@@ -960,6 +1045,7 @@ int main(int argc, char**argv){
     			}
     		}
     		
+    		//Calculating the mean of all bootstrap resamples for the flux of every transition
     		mat mean_flux(pow(2,L),pow(2,L),fill::zeros);
     		//calculating the mean
     		for (int j = 0; j<pow(2,L); j++){
@@ -972,7 +1058,8 @@ int main(int argc, char**argv){
     				mean_flux(j,k) = m;
     			}
     		}
-	
+	        
+	        // Create output file for the mean results of the bootstrap
 		ofstream trans_mean;
   		trans_mean.open("mean_" + out_name + ".txt");
   		trans_mean << "From " << "To " << "Probability " << "Flux" << endl;
@@ -985,6 +1072,7 @@ int main(int argc, char**argv){
   		}
   		trans_mean.close();
 	
+	        // Calculating the standard deviation of all bootstrap resamples for every entry in the transition matrix
   		mat sd(pow(2,L),pow(2,L),fill::zeros);
   		//calculating the standard deviation
   		for (int j = 0; j<pow(2,L); j++){
@@ -998,6 +1086,7 @@ int main(int argc, char**argv){
     			}
     		}
     		
+    		// Calculating the standard deviation of all bootstrap resamples for the flux of every transition
     		mat sd_flux(pow(2,L),pow(2,L),fill::zeros);
   		//calculating the standard deviation
   		for (int j = 0; j<pow(2,L); j++){
@@ -1011,6 +1100,7 @@ int main(int argc, char**argv){
     			}
     		}
 
+                // Create output file for the standard deviation results of the bootstrap
     		ofstream trans_sd;
   		trans_sd.open("sd_" + out_name + ".txt");
   		trans_sd << "From " << "To " << "Probability " << "Flux " << endl;

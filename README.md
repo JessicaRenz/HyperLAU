@@ -68,7 +68,7 @@ This script gives examples how to create the different types of plots we present
 Contains all the functions that are needed to create the different plots we presented in the article. For examples how to execute them, see `plot_HyperLAU_results.R`.
 
 ### prepare_and_plot_phylogeny.R
-This script was used to create and draw the phylogeny of the whole tuberculosis dataset (including uncertainties) that was used in the paper. 
+This script was used to create and draw the phylogeny of the whole tuberculosis dataset (including uncertainties) that was used in the paper. It requires some source code from HyperTraPS that can be found here https://github.com/StochasticBiology/hypertraps-ct?tab=readme-ov-file. Make sure that you saved the files `hypertraps.R`, `hypertraps.c` and `hypertraps-r.cpp` in the same directory as the `prepare_and_plot_phylogeny.R`script.
 
 ## Data
 In the `data` folder in this repository you can find the data sets we used in the article introducing HyperLAU. 

@@ -287,8 +287,9 @@ skeleton_plot = function(label1,label2,sd_yn){
 }
 
 
-pie_charts = function(data,L){
+pie_charts = function(data_file,L){
   
+  data = read.table(data_file)
   trans_0_0 = c(rep(0,10))
   trans_0_1 = c(rep(0,10))
   trans_0_Q = c(rep(0,10))
@@ -300,7 +301,7 @@ pie_charts = function(data,L){
   for( i in 1:nrow(data)){
     before = data[i,1]
     after = data[i,2]
-    for (j in 1:10){
+    for (j in 1:L){
       letter_1 = substr(before,j,j)
       letter_2 = substr(after,j,j)
       if ((letter_1 == "0")&&(letter_2 == "0")){
@@ -327,146 +328,29 @@ pie_charts = function(data,L){
     }
   }
 
-  f1 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[1], trans_0_1[1], trans_0_Q[1], trans_1_1[1],trans_Q_0[1],trans_Q_1[1],trans_Q_Q[1]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f1 = f1[f1$value != 0, ]
+  features <- vector("list",L)
+  
+  for (i in 1:L){
+    features[[i]] <- data.frame(category = c("0","1","?","1", "0", "1", "?"),
+                value = c(trans_0_0[i], trans_0_1[i], trans_0_Q[i], trans_1_1[i],trans_Q_0[i],trans_Q_1[i],trans_Q_Q[i]),
+                From = c("0","0","0","1","?","?","?")) 
+    features[[i]] = features[[i]][features[[i]]$value != 0,]
+  }
+  
+  plots = vector("list",L)
+  
+  for (i in 1:L){
+    plots[[i]] = ggplot(features[[i]], aes(x = "", y = value, fill = From))+
+                  geom_col(color = "white")+
+                  geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
+                  coord_polar(theta = "y")+
+                  theme_void()+
+                  ggtitle(paste("Feature ", i))+
+                  scale_fill_manual(values = c("red","grey","black"))
+    
+  }
 
-  f2 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[2], trans_0_1[2], trans_0_Q[2], trans_1_1[2],trans_Q_0[2],trans_Q_1[2],trans_Q_Q[2]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f2 = f2[f2$value != 0, ]
 
-  f3 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[3], trans_0_1[3], trans_0_Q[3], trans_1_1[3],trans_Q_0[3],trans_Q_1[3],trans_Q_Q[3]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f3 = f3[f3$value != 0, ]
-
-  f4 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[4], trans_0_1[4], trans_0_Q[4], trans_1_1[4],trans_Q_0[4],trans_Q_1[4],trans_Q_Q[4]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f4 = f4[f4$value != 0, ]
-
-  f5 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[5], trans_0_1[5], trans_0_Q[5], trans_1_1[5],trans_Q_0[5],trans_Q_1[5],trans_Q_Q[5]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f5 = f5[f5$value != 0, ]
-
-  f6 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[6], trans_0_1[6], trans_0_Q[6], trans_1_1[6],trans_Q_0[6],trans_Q_1[6],trans_Q_Q[6]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f6 = f6[f6$value != 0, ]
-
-  f7 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[7], trans_0_1[7], trans_0_Q[7], trans_1_1[7],trans_Q_0[7],trans_Q_1[7],trans_Q_Q[7]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f7 = f7[f7$value != 0, ]
-
-  f8 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[8], trans_0_1[8], trans_0_Q[8], trans_1_1[8],trans_Q_0[8],trans_Q_1[8],trans_Q_Q[8]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f8 = f8[f8$value != 0, ]
-
-  f9 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[9], trans_0_1[9], trans_0_Q[9], trans_1_1[9],trans_Q_0[9],trans_Q_1[9],trans_Q_Q[9]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f9 = f9[f9$value != 0, ]
-
-  f10 = data.frame(category = c("0","1","?","1", "0", "1", "?"),
-                value = c(trans_0_0[10], trans_0_1[10], trans_0_Q[10], trans_1_1[10],trans_Q_0[10],trans_Q_1[10],trans_Q_Q[10]),
-                From = c("0","0","0","1","?","?","?")
-  ) 
-  f10 = f10[f10$value != 0, ]
-
-  feature1 = ggplot(f1, aes(x = "", y = value, fill = From))+
-  geom_col(color = "white")+
-  geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-  coord_polar(theta = "y")+
-  theme_void()+
-  ggtitle("Feature 1")+
-  scale_fill_manual(values = c("red","grey","black"))
-
-  feature2 = ggplot(f2, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 2")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature3 = ggplot(f3, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 3")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature4 = ggplot(f4, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 4")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature5 = ggplot(f5, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 5")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature6 = ggplot(f6, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 6")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature7 = ggplot(f7, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 7")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature8 = ggplot(f8, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 8")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature9 = ggplot(f9, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 9")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  feature10 = ggplot(f10, aes(x = "", y = value, fill = From))+
-    geom_col(color = "white")+
-    geom_text(aes(x = 1.6,label = category), position = position_stack(vjust = 0.5))+
-    coord_polar(theta = "y")+
-    theme_void()+
-    ggtitle("Feature 10")+
-    scale_fill_manual(values = c("red","grey","black"))
-
-  plotB = ggarrange(feature1, feature2, feature3, feature4, feature5, feature6, feature7, feature8, feature9, feature10)
+  plotB = do.call(ggarrange,plots)
   return(plotB)
 }

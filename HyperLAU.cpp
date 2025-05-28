@@ -19,7 +19,7 @@ int L;
 string str;
 vector<string> R;
 
-/* (just taken from HyperHMM)
+/* this function was taken from HyperHMM https://github.com/StochasticBiology/hypercube-hmm
 A function for converting a number into a binary string.
 Input variables:
 - int n: The number you want to convert from int to binary string
@@ -46,7 +46,7 @@ string number2binary(int n, int L){
 	return binary;
 }
 
-/*(just taken from HyperHMM)
+/*this function was taken from HyperHMM https://github.com/StochasticBiology/hypercube-hmm
 A function for converting a binary string into a number.
 Input variables:
 - string bin: The binary string you want to convert to a number
@@ -66,8 +66,8 @@ int binary2int(string bin, int L){
 	return number;
 }
 
-//just taken from HyperHMM
-/*
+
+/* this function was taken from HyperHMM https://github.com/StochasticBiology/hypercube-hmm
 A function for creating numerous lists with information about the possible states to go to from a given state.
 Input variables (All of the vectors needs to be empty as input):
 - vector<int> n_partners: The number of possible states to go to from the state represented by the index.
@@ -171,9 +171,9 @@ void uniform_rate_matrix(vector<double>& rate_matrix, int model, int L){
 
 }
 
-//just taken from HyperHMM
 
-/* A  function that calculates the uniformized values >0 for the transition matrix, with the corresponding information about their position in the matrix.
+/* This function was taken from HyperHMM https://github.com/StochasticBiology/hypercube-hmm
+A  function that calculates the uniformized values >0 for the transition matrix, with the corresponding information about their position in the matrix.
 Input variables: (All of the vectors need to be empty as input):
 - vector A_val: contains the values (>0) that occur in the uniform transition matrix
 - vector A_row_ptr: stores the information about the corresponding row in the transition matrix

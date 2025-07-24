@@ -29,7 +29,7 @@ Additionally, you can costumize the simulation by setting some additionally flag
 
 The command below, for example, will run a dataset called `data.txt` and stores the result in an output file called `transitions_data.txt`. No bootstrap resamples will be executed, the random seed is set to one, and we will use the fully parameterized model `F`. In every optimization loop, the current temperature will be divided by 1.001.
 ```
-./HyperLAU data.txt data 0 1 -1 1.001
+./HyperLAU data.txt data 
 ```
 
 - **name of input file** Name of the file that contains the input data, including possible extensions like `.txt`. HyperLAU expects as an input a textfile containing a list of ancestor and descendant states separated by a blank space, for example `01? 011`. Both states are encoded by binary strings, but can contain one or more `?` to mark missing or uncertain data. Every line is considered as a sample independent of the others. For using cross-sectional data, just set all ancestor states to the zero-string.

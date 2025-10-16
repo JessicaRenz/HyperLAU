@@ -52,6 +52,18 @@ colnames(my.data)[1] = "label"
 my.rooted.tree = tree
 my.rooted.tree$tip.label = gsub("_", " ", my.rooted.tree$tip.label)
 
+# check for missing data in both barcodes and tips... from curate.tree
+match.set = match(my.data$label, my.rooted.tree$tip.label)
+if(any(is.na(match.set))) {
+  message("Found observations that didn't correspond to tips of the tree!")
+  my.data = my.data[-which(is.na(match.set)),]
+  match.set = match(my.data$label, my.rooted.tree$tip.label)
+}
+
+if(any(duplicated(my.data$label))) {
+  message("Duplicates in observation set!")
+}
+
 # prune tree to include only those tips in the barcode dataset
 my.tree = drop.tip(my.rooted.tree,
                    my.rooted.tree$tip.label[-match.set])

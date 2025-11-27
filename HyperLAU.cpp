@@ -260,7 +260,7 @@ double rate(int i, int j, vector<double> x_current, int L, int model){
 							for (int n = m; n<L; n++){
 								int digit_l = j_str[l] - '0';
 								int digit_m = j_str[m] - '0';
-								int digit_n = j_str[m] - '0';
+								int digit_n = j_str[n] - '0';
 								rate = rate + digit_l*digit_m*digit_n*x_current[l*L*L*L + m*L*L + n*L + locus];
 							}
 						}

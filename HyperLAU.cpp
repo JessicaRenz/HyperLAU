@@ -15,6 +15,9 @@ using namespace std::chrono;
 using std::ofstream;
 using Matrix = std::vector<std::vector<double>>;
 
+double total_lh_time = 0.0;
+long long n_lh_calls = 0;
+
 int L;
 string str;
 vector<string> R;
@@ -453,6 +456,8 @@ Output:
 */
 double loglh_minus_1(vector<string> before, vector<string> after, vector<int> frequ, int L, mat x_current){
 
+  auto lh_start = std::chrono::high_resolution_clock::now();
+
 //Calculate the new likelihood given the new matrix
 		vec loglh(before.size(), fill::zeros);
 		
@@ -571,6 +576,12 @@ double loglh_minus_1(vector<string> before, vector<string> after, vector<int> fr
 			}
 
 		}
+		auto lh_end = std::chrono::high_resolution_clock::now();
+
+              total_lh_time += std::chrono::duration<double>(lh_end - lh_start).count();
+
+              n_lh_calls++;
+              
 		return sum(loglh);
 
 
@@ -730,6 +741,10 @@ void simulated_annealing_minus_1(mat x_initial, mat& best_mat, int L, vector<str
 
 
 int main(int argc, char**argv){
+ofstream log("run_log.txt", ios::app);
+  auto total_start = std::chrono::high_resolution_clock::now();
+  
+    string dataset_file = argv[1];
         
         //consistency check, if all necessary arguments are specified via the command line, if not print a description of how to use HyperLAU
         const int expectedArgs = 3;
@@ -925,8 +940,27 @@ int main(int argc, char**argv){
   		liklh << prog_best_lik[i] << endl;
   	}
   	liklh.close();
+        
+	auto total_end = std::chrono::high_resolution_clock::now();
 
-	
+        double total_runtime = std::chrono::duration<double>(total_end - total_start).count();
+
+        double final_lik = prog_best_lik.back();
+        
+        log << "========================================\n";
+        log << "Dataset: " << dataset_file << "\n";
+        log << "Final log-likelihood: " << final_lik << "\n";
+
+        log << "Runtime: " << total_runtime << " s\n";
+        log << "Likelihood evaluations: "<< n_lh_calls << "\n";
+        log << "Total likelihood time: "<< total_lh_time << " s\n";
+
+        if (n_lh_calls > 0) {
+            log << "Average likelihood runtime: "<< total_lh_time / n_lh_calls << " s\n";
+        }
+        log << "\n";
+        
+        
 	// Bootstrapping
 	int l = data.size();
 	std::random_device rd;
@@ -1112,6 +1146,7 @@ int main(int argc, char**argv){
   			}
   		}
   		trans_sd.close();
+  		log.close();
   		
 	}
 	return 0;

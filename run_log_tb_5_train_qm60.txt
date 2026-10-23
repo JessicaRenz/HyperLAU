@@ -1,0 +1,8 @@
+========================================
+Dataset: tb_data_5_train_qm60.txt
+Final log-likelihood: -612.512
+Runtime: 59.9743 s
+Likelihood evaluations: 13824
+Total likelihood time: 58.7506 s
+Average likelihood runtime: 0.0042499 s
+

@@ -1,0 +1,8 @@
+========================================
+Dataset: tb_data_5_train.txt
+Final log-likelihood: -1350.62
+Runtime: 6.0743 s
+Likelihood evaluations: 13824
+Total likelihood time: 4.98311 s
+Average likelihood runtime: 0.000360468 s
+

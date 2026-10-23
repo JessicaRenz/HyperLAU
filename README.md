@@ -84,5 +84,6 @@ In the subfolder `model_comparison` are the training and test datasets that were
 
 The subfolder `tb` contains both datasets we used for the tuberculosis case studies. `tb_data_10.txt` contains the phyloegeny reconstructed by considering only the datapoints of string length ten containing no missing states. Into this dataset, we inserted uncertainty markers ("?") with a probability of $0.5$ at all positions, which is the dataset `tb_data_10_qm50.txt`. The file `independent-transitions.txt` contain the used independent transitions obtained from the phylogeny when used the whole tuberculosis dataset, including all naturally occuring missing states.
 
+## Other folders
 
 The folder `Results_HyperLAU` contains the HyperLAU results of the analysis discussed in the SI of the published article. The corresponding results of HyperHMM and HyperTraPS are in the folder `comparisons`, together with the used scripts to evaluate the likelihoods of the results and the scripts to run the models. The provided R script `plots.R` within the `comparisons` folder was used to create the plots of the runtime and likelihood developments in the SI of the article. 
